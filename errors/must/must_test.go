@@ -51,7 +51,7 @@ func ExampleReturnErr() {
 		i := Int(strconv.Atoi("a"))
 		fmt.Println(i)
 
-		// Or even simply inline.
+		// Or inlined.
 		fmt.Println(Int(strconv.Atoi("b")))
 
 		// Compare with the following.
