@@ -41,7 +41,7 @@ func TestReturnError_NoError(t *testing.T) {
 	}
 }
 
-func ExampleReturnError() {
+func ExampleReturnErr() {
 	err := func() (err error) {
 		// All errors captured by must package is returned. Without this defer line
 		// captured errors will panic.
@@ -67,7 +67,7 @@ func ExampleReturnError() {
 	// strconv.ParseInt: parsing "a": invalid syntax
 }
 
-func ExampleReturnError_multipleRecover() {
+func ExampleReturnErr_multipleRecover() {
 	func() (err error) {
 		// Deferred calls are executed in last-in-first-out order. If a deferred
 		// function recovers from any panic, defer of the function should come
