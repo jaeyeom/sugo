@@ -90,7 +90,7 @@ func main() {
 	for _, ts := range types {
 		fmt.Printf("// %s panics if err is non-nil and returns %s.\n", ts.funcName(), ts.returnTypeList())
 		fmt.Printf("func %s(%s, err error) %s {\n", ts.funcName(), ts.argList(), ts.returnTypeList())
-		fmt.Println("\tNil(err)")
+		fmt.Println("\tCheckErrWithCallerSkip(err, 2)")
 		fmt.Printf("\treturn %s\n", ts.returnList())
 		fmt.Println("}")
 		fmt.Println()

@@ -1,7 +1,19 @@
 package must
 
+import (
+	"fmt"
+	"path/filepath"
+)
+
 type wrap struct {
-	err error
+	err  error
+	file string
+	line int
+}
+
+// Error returns an error string with file and line.
+func (w wrap) Error() string {
+	return fmt.Sprintf("%s:%d %v", filepath.Base(w.file), w.line, w.err)
 }
 
 // ReturnErr is a defer function to simplify returning errors. The pointer to
@@ -14,6 +26,16 @@ func ReturnErr(perr *error) {
 		} else {
 			panic(r)
 		}
+	}
+}
+
+// LogErr is a defer function to simplify logging.
+func LogErr(logger func(...interface{})) {
+	if r := recover(); r != nil {
+		if e, ok := r.(wrap); ok {
+			logger(e)
+		}
+		panic(r)
 	}
 }
 

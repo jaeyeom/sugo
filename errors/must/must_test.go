@@ -3,6 +3,7 @@ package must
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"testing"
 )
@@ -96,6 +97,19 @@ func ExampleAny() {
 		return nil
 	}()
 	fmt.Println(err)
+	// Output:
+	// strconv.ParseInt: parsing "a": invalid syntax
+}
+
+func ExampleLogErr() {
+	err := func() (err error) {
+		defer ReturnErr(&err)
+		// Log error to stderr with file name and line number.
+		defer LogErr(log.Println)
+		_ = Int(strconv.Atoi("a"))
+		return nil
+	}()
+	fmt.Println(err.Error())
 	// Output:
 	// strconv.ParseInt: parsing "a": invalid syntax
 }
