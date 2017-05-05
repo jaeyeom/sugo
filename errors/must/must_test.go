@@ -43,6 +43,7 @@ func TestReturnError_NoError(t *testing.T) {
 }
 
 func ExampleReturnErr() {
+	// TODO: Fix the fragile test dependency to the error message.
 	err := func() (err error) {
 		// All errors captured by must package is returned. Without this defer line
 		// captured errors will panic.
@@ -65,7 +66,7 @@ func ExampleReturnErr() {
 	}()
 	fmt.Println(err)
 	// Output:
-	// strconv.ParseInt: parsing "a": invalid syntax
+	// strconv.Atoi: parsing "a": invalid syntax
 }
 
 func ExampleReturnErr_multipleRecover() {
@@ -85,6 +86,7 @@ func ExampleReturnErr_multipleRecover() {
 }
 
 func ExampleAny() {
+	// TODO: Fix the fragile test dependency to the error message.
 	err := func() (err error) {
 		defer ReturnErr(&err)
 
@@ -98,10 +100,11 @@ func ExampleAny() {
 	}()
 	fmt.Println(err)
 	// Output:
-	// strconv.ParseInt: parsing "a": invalid syntax
+	// strconv.Atoi: parsing "a": invalid syntax
 }
 
 func ExampleLogErr() {
+	// TODO: Fix the fragile test dependency to the error message.
 	err := func() (err error) {
 		defer ReturnErr(&err)
 		// Log error to stderr with file name and line number.
@@ -111,5 +114,5 @@ func ExampleLogErr() {
 	}()
 	fmt.Println(err.Error())
 	// Output:
-	// strconv.ParseInt: parsing "a": invalid syntax
+	// strconv.Atoi: parsing "a": invalid syntax
 }
