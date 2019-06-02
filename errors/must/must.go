@@ -18,7 +18,7 @@ import "runtime"
 // to write custom must functions.
 func CheckErr(err error, skip int) {
 	if err != nil {
-		_, file, line, _ := runtime.Caller(2)
+		_, file, line, _ := runtime.Caller(skip)
 		panic(wrap{err, file, line})
 	}
 }
