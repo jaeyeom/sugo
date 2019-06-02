@@ -36,7 +36,7 @@ func TestReturnError(t *testing.T) {
 	}
 }
 
-func TestReturnError_NoError(t *testing.T) {
+func TestReturnError_noError(t *testing.T) {
 	if repeatHello("0") != nil {
 		t.Error("should return nil error")
 	}
@@ -50,6 +50,7 @@ func ExampleReturnErr() {
 		defer ReturnErr(&err)
 
 		// Error handling is simplified here.
+		// From other packages it looks like must.Int(...).
 		i := Int(strconv.Atoi("a"))
 		fmt.Println(i)
 
@@ -61,6 +62,7 @@ func ExampleReturnErr() {
 		if err != nil {
 			return err
 		}
+		fmt.Println(i)
 
 		return nil
 	}()
@@ -70,7 +72,7 @@ func ExampleReturnErr() {
 }
 
 func ExampleReturnErr_multipleRecover() {
-	func() (err error) {
+	_ = func() (err error) {
 		// Deferred calls are executed in last-in-first-out order. If a deferred
 		// function recovers from any panic, defer of the function should come
 		// before defer ReturnErr.
@@ -79,7 +81,6 @@ func ExampleReturnErr_multipleRecover() {
 
 		_ = Int(strconv.Atoi("1"))
 		panic(errors.New("created panic"))
-		return nil
 	}()
 	// Output:
 	// panic: created panic
@@ -93,7 +94,7 @@ func ExampleAny() {
 		// Any can be used with any types, but it's less efficient. For any types
 		// that must package does not support, consider writing your own 2-line
 		// defer function, or use Any.
-		var i int = Any(strconv.Atoi("a")).(int)
+		var i = Any(strconv.Atoi("a")).(int)
 		fmt.Println(i)
 
 		return nil
