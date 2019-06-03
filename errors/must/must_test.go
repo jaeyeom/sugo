@@ -144,9 +144,9 @@ func ExampleHandleErr_wrapError() {
 
 func ExampleHandleErr_justReturnError() {
 	// TODO: Fix the fragile test dependency to the error message.
-	//
-	// Equivalent with ReturnErr().
 	err := func() (err error) {
+		// Equivalent with ReturnErr(&err). Param name is newerr for err
+		// visibility.
 		defer HandleErr(func(newerr error) {
 			err = newerr
 		})
@@ -162,6 +162,7 @@ func ExampleHandleErr_fromGoVersion2Draft() {
 	// Translation of the code example of Go 2 error handling draft.
 	// https://go.googlesource.com/proposal/+/master/design/go2draft-error-handling-overview.md
 	copyFile := func(src, dst string) (err error) {
+		// Param name is newerr for err visibility.
 		defer HandleErr(func(newerr error) {
 			err = fmt.Errorf("copy %s %s: %v", src, dst, newerr)
 		})
@@ -170,7 +171,7 @@ func ExampleHandleErr_fromGoVersion2Draft() {
 		defer r.Close()
 
 		w := Any(os.Create(dst)).(*os.File)
-		defer HandleErrNext(func(newerr error) {
+		defer HandleErrNext(func(error) {
 			w.Close()
 			os.Remove(dst) // (only if a check fails)
 		})
@@ -183,8 +184,9 @@ func ExampleHandleErr_fromGoVersion2Draft() {
 }
 
 func ExampleHandleErr_fromGoVersion2DraftTestedSuccess() {
-	// From Go 2 draft design example.
+	// To demonstrate how it works when successful.
 	copyFile := func(src, dst string) (err error) {
+		// Param name is newerr for err visibility.
 		defer HandleErr(func(newerr error) {
 			err = fmt.Errorf("copy %s %s: %v", src, dst, newerr)
 		})
@@ -217,8 +219,9 @@ func ExampleHandleErr_fromGoVersion2DraftTestedSuccess() {
 }
 
 func ExampleHandleErr_fromGoVersion2DraftTestedWriteFail() {
-	// From Go 2 draft design example.
+	// To demonstrate how it works when successful.
 	copyFile := func(src, dst string) (err error) {
+		// Param name is newerr for err visibility.
 		defer HandleErr(func(newerr error) {
 			err = fmt.Errorf("copy %s %s: %v", src, dst, newerr)
 		})
