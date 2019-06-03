@@ -110,10 +110,11 @@ func ExampleLogErr() {
 		defer ReturnErr(&err)
 		// Log error to stderr with file name and line number.
 		defer LogErr(log.Println)
-		_ = Int(strconv.Atoi("a"))
+		i := Int(strconv.Atoi("a"))
+		fmt.Printf("i = %d\n", i)
 		return nil
 	}()
-	fmt.Println(err.Error())
+	fmt.Println(err)
 	// Output:
 	// strconv.Atoi: parsing "a": invalid syntax
 }

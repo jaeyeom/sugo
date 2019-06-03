@@ -17,7 +17,7 @@ func (w wrap) Error() string {
 }
 
 // ReturnErr is a defer function to simplify returning errors. The pointer to
-// the returning error variable should be passed. Errors captured by must
+// the returning error variable perr should be passed. Errors captured by must
 // package are handled. Other panic values won't be handled here.
 func ReturnErr(perr *error) {
 	if r := recover(); r != nil {
