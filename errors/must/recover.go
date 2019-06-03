@@ -50,3 +50,16 @@ func HandleErr(handler func(error)) {
 		}
 	}
 }
+
+// HandleErrNext is a defer function to customize the following (2nd, 3rd, ...)
+// error handling. This is similar to HandleErr except the panic is not
+// consumed. Use this to let other deferred handlers above handle the error as
+// well.
+func HandleErrNext(handler func(error)) {
+	if r := recover(); r != nil {
+		if e, ok := r.(wrap); ok {
+			handler(e.err)
+		}
+		panic(r)
+	}
+}

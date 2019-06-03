@@ -4,11 +4,15 @@
 //
 // - Return errors.
 // - Panic.
-// - Log errors and continue.
+// - Handle errors.
 //
 // This package provides a way to hide error handling and focus on the main
 // logic. The code may look a lot cleaner. The downside is that the explicit
 // return statement is hidden to look unclear.
+//
+// Well written Go code indents error flow and the function should be short
+// enough, so this package shouldn't be required. (But Go 2 draft seems to adopt
+// this idea.)
 package must
 
 import "runtime"
