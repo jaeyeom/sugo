@@ -257,3 +257,36 @@ func ExampleHandleErr_fromGoVersion2DraftTestedWriteFail() {
 	// r.Close() is called: *File("input.txt")
 	// returned error: copy input.txt output.txt: cannot write file
 }
+
+func ExampleHandleErrorf_returnError() {
+	f := func(id int) (err error) {
+		defer HandleErrorf(&err, "error occurred in example %d", id)
+		return errors.New("failed")
+	}
+	fmt.Println(f(10))
+	// Output: error occurred in example 10: failed
+}
+
+func ExampleHandleErrorf_must() {
+	f := func(id int) (err error) {
+		defer HandleErrorf(&err, "error occurred in example %d", id)
+		fmt.Println(Int(strconv.Atoi("a")))
+		return nil
+	}
+	fmt.Println(f(10))
+	// Output: error occurred in example 10: strconv.Atoi: parsing "a": invalid syntax
+}
+
+func ExampleHandleErrorf_multiple() {
+	f := func(id int) (err error) {
+		defer HandleErrorf(&err, "error occurred in example %d", id)
+		fmt.Println("running well")
+		defer HandleErrorf(&err, "after running well")
+		fmt.Println(Int(strconv.Atoi("a")))
+		return nil
+	}
+	fmt.Println(f(10))
+	// Output:
+	// running well
+	// error occurred in example 10: after running well: strconv.Atoi: parsing "a": invalid syntax
+}

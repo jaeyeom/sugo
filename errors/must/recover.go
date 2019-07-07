@@ -3,6 +3,8 @@ package must
 import (
 	"fmt"
 	"path/filepath"
+
+	"golang.org/x/xerrors"
 )
 
 type wrap struct {
@@ -61,5 +63,26 @@ func HandleErrNext(handler func(error)) {
 			handler(e.err)
 		}
 		panic(r)
+	}
+}
+
+// HandleErrorf is a defer function to wrap the error. It appears in Go 2 try
+// proposal. Implicitly it does what ReturnErr(&err), because try always
+// returns. If you'd like to use try without HandleErrorf, use ReturnErr, since
+// the deafult behavior of must check is panic. In case you defer HandleErrorf,
+// you don't need to defer ReturnErr.
+//
+// Here's the link to Go 2 try proposal: https://github.com/golang/go/issues/32437
+func HandleErrorf(perr *error, format string, args ...interface{}) {
+	if r := recover(); r != nil {
+		if e, ok := r.(wrap); ok {
+			*perr = e.err
+		} else {
+			panic(r)
+		}
+	}
+	if *perr != nil {
+		args = append(args, *perr)
+		*perr = xerrors.Errorf(format+": %w", args...)
 	}
 }

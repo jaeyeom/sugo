@@ -13,6 +13,13 @@
 // Well written Go code indents error flow and the function should be short
 // enough, so this package shouldn't be required. (But Go 2 draft seems to adopt
 // this idea.)
+//
+// By default, must panics. If you'd like to return error by default (like Go 2
+// try proposal), defer ReturnErr(&err) in the beginning. If you'd like to wrap
+// the error, you may use HandleErrorf(&err, "format string", args...), and this
+// works with both normal error return and try-like must.
+//
+// You may customize error handling more flexible way using HandleErr.
 package must
 
 import "runtime"
