@@ -1,7 +1,11 @@
 package par
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"strconv"
+	"sync"
 )
 
 func ExampleFor_rowSum() {
@@ -24,6 +28,15 @@ func ExampleFor_rowSum() {
 	// [124 123 346]
 }
 
+// Sum adds all the numbers in the in channel and returns the sum.
+func sum(in <-chan int) int {
+	var total int
+	for n := range in {
+		total += n
+	}
+	return total
+}
+
 func ExampleFor_sum() {
 	// An example with generator patterns. If the generator returns a
 	// channel, the generator is responsible for closing the channel. Pros
@@ -38,13 +51,6 @@ func ExampleFor_sum() {
 			}
 		}()
 		return out
-	}
-	sum := func(in <-chan int) int {
-		var total int
-		for n := range in {
-			total += n
-		}
-		return total
 	}
 	partial := func(n int, in <-chan int) <-chan int {
 		out := make(chan int)
@@ -65,18 +71,11 @@ func ExampleFor_sum() {
 	// 4950
 }
 
+// A different pattern to use Do function to run different pipeline
+// stages in parallel. Since it removes go func() from the code, it may
+// look simpler. But it's more difficult to reuse each stage worker
+// implementation.
 func ExampleDo_sum() {
-	// A different pattern to use Do function to run different pipeline
-	// stages in parallel. Since it removes go func() from the code, it may
-	// look simpler. But it's more difficult to reuse each stage worker
-	// implementation.
-	sum := func(in <-chan int) int {
-		var total int
-		for n := range in {
-			total += n
-		}
-		return total
-	}
 	nums, partial := make(chan int), make(chan int)
 	Do(
 		func() {
@@ -97,4 +96,80 @@ func ExampleDo_sum() {
 	)
 	// Output:
 	// 4950
+}
+
+// This example shows how to terminate all pipeline workers and returns the
+// error, when an error occurred from one of the workers.
+func ExampleDo_sumReturnErr() {
+	intentionalError := false
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel() // Defer not to leak.
+	sumLines := func() (n int, err error) {
+		lines, nums, partial := make(chan string), make(chan int), make(chan int)
+		var once sync.Once
+		returnErr := func(newErr error) {
+			if newErr == nil {
+				return
+			}
+			// Returns the first error only.
+			once.Do(func() {
+				cancel()
+				err = newErr
+			})
+		}
+		Do(
+			func() {
+				defer close(lines)
+				for i := 0; i < 100; i++ {
+					next := fmt.Sprint(i)
+					if intentionalError && i == 55 {
+						next = fmt.Sprint("")
+					}
+					select {
+					case lines <- next:
+					case <-ctx.Done():
+						return
+					}
+				}
+			},
+			func() {
+				defer close(nums)
+				for line := range lines {
+					n, err := strconv.Atoi(line)
+					if err != nil {
+						returnErr(errors.New("intentional error"))
+						return
+					}
+					select {
+					case nums <- n:
+					case <-ctx.Done():
+						return
+					}
+				}
+			},
+			func() {
+				defer close(partial)
+				For(10, func(i int) {
+					select {
+					case partial <- sum(nums):
+					case <-ctx.Done():
+						return
+					}
+				})
+			},
+			func() {
+				n = sum(partial)
+			},
+		)
+		if err != nil {
+			return 0, err
+		}
+		return n, nil
+	}
+	fmt.Println(sumLines())
+	intentionalError = true
+	fmt.Println(sumLines())
+	// Output:
+	// 4950 <nil>
+	// 0 intentional error
 }
