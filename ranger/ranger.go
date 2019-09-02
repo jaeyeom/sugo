@@ -47,9 +47,9 @@ func (ap *ArithProg) Next() int {
 	return n
 }
 
-// FiniteIth returns a function that checks if 0 <= i < size and returns ith
+// FiniteIthFunc returns a function that checks if 0 <= i < size and returns ith
 // number in sequencee.
-func FiniteIth(size int, ithFunc func(i int) int) func(i int) int {
+func FiniteIthFunc(size int, ithFunc func(i int) int) func(i int) int {
 	return func(i int) int {
 		if i < 0 {
 			panic(fmt.Sprintf("invlid index %d (i must be non-negative)", i))
@@ -116,13 +116,19 @@ func SizeOfRange(begin, end, step int) int {
 	return (Abs(end-begin) + Abs(step) - 1) / Abs(step)
 }
 
+// FiniteIth has the size and ith function together.
+type FiniteIth struct {
+	Size int
+	Ith  func(i int) int
+}
+
 // Range returns a new finite range with the given begin, end, step.
 // Begin is inclusive and end is exclusive. If step is 0, it is treated as 1.
-func Range(begin, end, step int) (size int, ithFunc func(i int) int) {
+func Range(begin, end, step int) FiniteIth {
 	if step == 0 {
 		step = 1
 	}
 	ap := ArithProg{Begin: begin, Step: step}
-	size = SizeOfRange(begin, end, step)
-	return size, FiniteIth(size, ap.Ith)
+	size := SizeOfRange(begin, end, step)
+	return FiniteIth{Size: size, Ith: FiniteIthFunc(size, ap.Ith)}
 }

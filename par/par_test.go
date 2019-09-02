@@ -32,9 +32,9 @@ func ExampleFor_rowSum() {
 func ExampleFor_loopWithStep() {
 	data := []int{1, 2, 3, 4, 5, 6}
 	// Index 1, 3, 5
-	size, ithFunc := ranger.Range(1, len(data), 2)
-	For(size, func(i int) {
-		data[ithFunc(i)] += 10
+	fi := ranger.Range(1, len(data), 2)
+	For(fi.Size, func(i int) {
+		data[fi.Ith(i)] += 10
 	})
 	fmt.Println(data)
 	// Output: [1 12 3 14 5 16]

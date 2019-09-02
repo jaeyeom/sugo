@@ -92,10 +92,10 @@ func TestSizeOfRange(t *testing.T) {
 
 func ExampleRange() {
 	for _, in := range ins {
-		size, ithFunc := Range(in.begin, in.end, in.step)
+		fi := Range(in.begin, in.end, in.step)
 		var ints []int
-		for i := 0; i < size; i++ {
-			ints = append(ints, ithFunc(i))
+		for i := 0; i < fi.Size; i++ {
+			ints = append(ints, fi.Ith(i))
 		}
 		fmt.Printf("%v => %v\n", in, ints)
 	}
@@ -110,8 +110,8 @@ func ExampleRange() {
 
 func ExampleRange_iterator() {
 	for _, in := range ins {
-		size, ithFunc := Range(in.begin, in.end, in.step)
-		itr := FiniteIterator{Size: size, Itr: &IthIterator{IthFunc: ithFunc}}
+		fi := Range(in.begin, in.end, in.step)
+		itr := FiniteIterator{Size: fi.Size, Itr: &IthIterator{IthFunc: fi.Ith}}
 		var ints []int
 		for !itr.Empty() {
 			ints = append(ints, itr.Next())
@@ -132,24 +132,24 @@ func TestRange_Ith(t *testing.T) {
 	properties.Property("Ith should produce the same number that for-loop produces", prop.ForAll(
 		func(begin, end, step int) bool {
 			var count int
-			_, ithFunc := Range(begin, end, step)
+			fi := Range(begin, end, step)
 			if step > 0 {
 				for i := begin; i < end; i += step {
-					if ithFunc(count) != i {
+					if fi.Ith(count) != i {
 						return false
 					}
 					count++
 				}
 			} else if step < 0 {
 				for i := begin; i > end; i += step {
-					if ithFunc(count) != i {
+					if fi.Ith(count) != i {
 						return false
 					}
 					count++
 				}
 			} else {
 				for i := begin; i < end; i++ {
-					if ithFunc(count) != i {
+					if fi.Ith(count) != i {
 						return false
 					}
 					count++
