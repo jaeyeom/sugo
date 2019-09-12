@@ -1,7 +1,10 @@
 // Package ranger provides some functions to deal with integer indices.
 package ranger
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // Sgn returns the sign of the given integer x. It returns -1, 0, or 1.
 func Sgn(x int) int {
@@ -131,4 +134,58 @@ func Range(begin, end, step int) FiniteIth {
 	ap := ArithProg{Begin: begin, Step: step}
 	size := SizeOfRange(begin, end, step)
 	return FiniteIth{Size: size, Ith: FiniteIthFunc(size, ap.Ith)}
+}
+
+// FromIndices returns a new FiniteIth where ith is mapped to indices[i].
+func FromIndices(indices []int) FiniteIth {
+	return FiniteIth{Size: len(indices), Ith: func(i int) int {
+		return indices[i]
+	}}
+}
+
+// Partition returns ith part out of numParts parts of the range.
+func (f FiniteIth) Partition(i, numParts int) FiniteIth {
+	if numParts <= 0 || i >= numParts {
+		panic("wrong arguments")
+	}
+	if numParts == 1 {
+		return f
+	}
+	partSize := (f.Size + numParts - 1) / numParts
+	begin := partSize * i
+	if i == numParts-1 {
+		partSize = f.Size - begin
+	}
+	return FiniteIth{Size: partSize, Ith: func(i int) int {
+		return f.Ith(begin + i)
+	}}
+}
+
+// AsSortInterface returns a sort.Interface based on the given data in this
+// range.
+func (f FiniteIth) AsSortInterface(data sort.Interface) SortFiniteIth {
+	return SortFiniteIth{FiniteIth: f, data: data}
+}
+
+// SortFiniteIth implements sort interface.
+type SortFiniteIth struct {
+	FiniteIth
+	data sort.Interface
+}
+
+// Len returns the size of FiniteIth. It implements sort.Interface.
+func (sfi SortFiniteIth) Len() int {
+	return sfi.Size
+}
+
+// Less returns true if the translated ith element is less than the translated
+// jth element. It implements sort.Interface.
+func (sfi SortFiniteIth) Less(i, j int) bool {
+	return sfi.data.Less(sfi.Ith(i), sfi.Ith(j))
+}
+
+// Swap swaps the translated ith element and the translated jth element. It
+// implements sort.Interface.
+func (sfi SortFiniteIth) Swap(i, j int) {
+	sfi.data.Swap(sfi.Ith(i), sfi.Ith(j))
 }

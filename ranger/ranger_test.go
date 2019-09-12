@@ -2,6 +2,7 @@ package ranger
 
 import (
 	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/leanovate/gopter"
@@ -162,4 +163,51 @@ func TestRange_Ith(t *testing.T) {
 		gen.IntRange(-30000, 30000),
 	))
 	properties.TestingRun(t)
+}
+
+func ExampleFromIndices() {
+	fi := FromIndices([]int{1, 3, 5, 7})
+	for i := 0; i < fi.Size; i++ {
+		fmt.Println(fi.Ith(i))
+	}
+	// Output:
+	// 1
+	// 3
+	// 5
+	// 7
+}
+
+func ExampleFiniteIth_Partition() {
+	ex := Range(0, 22, 1)
+	chunks := 4
+	for i := 0; i < chunks; i++ {
+		p := ex.Partition(i, chunks)
+		var elems []int
+		for j := 0; j < p.Size; j++ {
+			elems = append(elems, p.Ith(j))
+		}
+		fmt.Println(elems)
+	}
+	// Output:
+	// [0 1 2 3 4 5]
+	// [6 7 8 9 10 11]
+	// [12 13 14 15 16 17]
+	// [18 19 20 21]
+}
+
+func ExampleFiniteIth_AsSortInterface() {
+	alphas := sort.StringSlice{
+		"a", "b", "c",
+		"d", "e", "f",
+		"g", "h", "i",
+	}
+	ordering := []int{0, 1, 4, 3, 6, 7, 8, 5, 2}
+	sort.Sort(FromIndices(ordering).AsSortInterface(alphas))
+	for i := 0; i < 3; i++ {
+		fmt.Println(alphas[i*3 : (i+1)*3])
+	}
+	// Output:
+	// [a b i]
+	// [d c h]
+	// [e f g]
 }
