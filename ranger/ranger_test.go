@@ -196,15 +196,26 @@ func ExampleFiniteIth_Partition() {
 }
 
 func ExampleFiniteIth_AsSortInterface() {
+	s := NDShape(ND{3, 3})
 	alphas := sort.StringSlice{
 		"a", "b", "c",
 		"d", "e", "f",
 		"g", "h", "i",
 	}
-	ordering := []int{0, 1, 4, 3, 6, 7, 8, 5, 2}
+	ordering := []int{
+		s.ToIth(ND{0, 0}),
+		s.ToIth(ND{0, 1}),
+		s.ToIth(ND{1, 1}),
+		s.ToIth(ND{1, 0}),
+		s.ToIth(ND{2, 0}),
+		s.ToIth(ND{2, 1}),
+		s.ToIth(ND{2, 2}),
+		s.ToIth(ND{1, 2}),
+		s.ToIth(ND{0, 2}),
+	}
 	sort.Sort(FromIndices(ordering).AsSortInterface(alphas))
 	for i := 0; i < 3; i++ {
-		fmt.Println(alphas[i*3 : (i+1)*3])
+		fmt.Println(alphas[s.ToIth(ND{i, 0}):s.ToIth(ND{i + 1, 0})])
 	}
 	// Output:
 	// [a b i]
