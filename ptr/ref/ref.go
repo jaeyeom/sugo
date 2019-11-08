@@ -1,4 +1,9 @@
 // Package ref provides helper functions to create pointer to a value.
+//
+// These functions are handy whenever you need a pointer to a primitive value.
+// It's easy to create a pointer to a struct, but there's no simple way to do
+// that for numbers, strings, etc. Protocol buffer Go API has these functions,
+// too.
 package ref
 
 // Bool returns a pointer to v.

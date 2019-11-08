@@ -1,4 +1,7 @@
 // Package deref provides helper functions to dereference pointers.
+//
+// These functions are handy when you need to dereference a pointer to a value
+// taking care of nil pointers.
 package deref
 
 // BoolOr returns a dereferenced value or the given default value if p is nil.
