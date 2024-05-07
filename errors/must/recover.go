@@ -3,8 +3,6 @@ package must
 import (
 	"fmt"
 	"path/filepath"
-
-	"golang.org/x/xerrors"
 )
 
 type wrap struct {
@@ -83,6 +81,6 @@ func HandleErrorf(perr *error, format string, args ...interface{}) {
 	}
 	if *perr != nil {
 		args = append(args, *perr)
-		*perr = xerrors.Errorf(format+": %w", args...)
+		*perr = fmt.Errorf(format+": %w", args...)
 	}
 }
