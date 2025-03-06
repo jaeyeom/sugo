@@ -13,7 +13,7 @@ func (ts typeNames) funcName() (name string) {
 		if strings.HasPrefix(string(t), "[]") {
 			t = t[2:] + "s"
 		}
-		name += strings.Title(string(t))
+		name += strings.ToUpper(string(t)[:1]) + string(t)[1:]
 	}
 	return name
 }
@@ -90,7 +90,7 @@ func main() {
 	for _, ts := range types {
 		fmt.Printf("// %s panics if err is non-nil and returns %s.\n", ts.funcName(), ts.returnTypeList())
 		fmt.Printf("func %s(%s, err error) %s {\n", ts.funcName(), ts.argList(), ts.returnTypeList())
-		fmt.Println("\tCheckErrWithCallerSkip(err, 2)")
+		fmt.Println("\tCheckErr(err, 2)")
 		fmt.Printf("\treturn %s\n", ts.returnList())
 		fmt.Println("}")
 		fmt.Println()

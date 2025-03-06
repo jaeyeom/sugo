@@ -2,9 +2,9 @@
 //
 // Mainly there are 3 ways to handle errors.
 //
-//  - Return errors.
-//  - Panic.
-//  - Handle errors.
+//   - Return errors.
+//   - Panic.
+//   - Handle errors.
 //
 // This package provides a way to hide error handling and focus on the main
 // logic. The code may look a lot cleaner. The downside is that the explicit

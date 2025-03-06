@@ -9,7 +9,7 @@ import (
 type typeName string
 
 func (t typeName) funcName() string {
-	return strings.Title(string(t))
+	return strings.ToUpper(string(t)[:1]) + string(t)[1:]
 }
 
 func (t typeName) String() string {

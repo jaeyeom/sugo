@@ -135,7 +135,7 @@ func ExampleDo_sumReturnErr() {
 				for i := 0; i < 100; i++ {
 					next := fmt.Sprint(i)
 					if intentionalError && i == 55 {
-						next = fmt.Sprint("")
+						next = ""
 					}
 					select {
 					case lines <- next:
