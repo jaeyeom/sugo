@@ -31,7 +31,7 @@ func TestDoWithTimeout_Timeout(t *testing.T) {
 	}
 
 	err := DoWithTimeout(ctx, timeout, f)
-	if err != context.DeadlineExceeded {
+	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Errorf("Expected context.DeadlineExceeded, got %v", err)
 	}
 }
@@ -47,7 +47,7 @@ func TestDoWithTimeout_ContextCanceled(t *testing.T) {
 	// Cancel context before calling DoWithTimeout
 	cancel()
 	err := DoWithTimeout(ctx, timeout, f)
-	if err != context.Canceled {
+	if !errors.Is(err, context.Canceled) {
 		t.Errorf("Expected context.Canceled, got %v", err)
 	}
 }
@@ -93,7 +93,7 @@ func TestDoWithTimeout_FunctionError(t *testing.T) {
 	}
 
 	err := DoWithTimeout(ctx, timeout, f)
-	if err != expectedErr {
+	if !errors.Is(err, expectedErr) {
 		t.Errorf("Expected error %v, got %v", expectedErr, err)
 	}
 }
@@ -114,7 +114,7 @@ func TestDoWithTimeout_ContextCanceledDuringExecution(t *testing.T) {
 	}()
 
 	err := DoWithTimeout(ctx, timeout, f)
-	if err != context.Canceled {
+	if !errors.Is(err, context.Canceled) {
 		t.Errorf("Expected context.Canceled, got %v", err)
 	}
 }
