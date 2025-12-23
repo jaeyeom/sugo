@@ -44,7 +44,7 @@ func ExampleGroup_multiple() {
 	// deferred 1
 }
 
-func ExampleGroup_clear() {
+func ExampleGroup_CancelAll() {
 	f := func() {
 		g := New()
 		defer g.Done()
@@ -54,7 +54,7 @@ func ExampleGroup_clear() {
 		g.Defer(func() {
 			fmt.Println("deferred 2")
 		})
-		g.Clear()
+		g.CancelAll()
 	}
 	f()
 	// Output:
@@ -63,7 +63,7 @@ func ExampleGroup_clear() {
 func ExampleGroup_noError() {
 	// When there's no error, the deferred functions are ignored.
 	f := func() (err error) {
-		g := New(WithError(&err))
+		g := New(OnlyOnError(&err))
 		defer g.Done()
 		g.Defer(func() {
 			fmt.Println("deferred 1")
@@ -82,7 +82,7 @@ func ExampleGroup_noError() {
 func ExampleGroup_error() {
 	// When there's an error, the deferred functions are executed.
 	f := func() (err error) {
-		g := New(WithError(&err))
+		g := New(OnlyOnError(&err))
 		defer g.Done()
 		g.Defer(func() {
 			fmt.Println("deferred 1")
@@ -119,7 +119,7 @@ func (r *resource) Close() {
 
 func ExampleGroup_noCloseForNoError() {
 	f := func() (err error) {
-		g := New(WithError(&err))
+		g := New(OnlyOnError(&err))
 		defer g.Done()
 		r1, err := newResource("resource 1")
 		if err != nil {
@@ -141,7 +141,7 @@ func ExampleGroup_noCloseForNoError() {
 
 func ExampleGroup_partialClose() {
 	f := func() (err error) {
-		g := New(WithError(&err))
+		g := New(OnlyOnError(&err))
 		defer g.Done()
 		r1, err := newResource("resource 1")
 		if err != nil {
@@ -161,4 +161,75 @@ func ExampleGroup_partialClose() {
 	// Output:
 	// closing resource 1
 	// Function f failed: unable to create resource
+}
+
+// server holds multiple resources that need cleanup.
+type server struct {
+	r1 *resource
+	r2 *resource
+	dg *Group
+}
+
+// newServerWith creates a server using the provided resource constructors.
+// If any acquisition fails, previously acquired resources are cleaned up automatically.
+func newServerWith(newR1, newR2 func(string) (*resource, error)) (*server, error) {
+	dg := New()
+	defer dg.Done()
+
+	r1, err := newR1("connection")
+	if err != nil {
+		return nil, err
+	}
+	dg.Defer(r1.Close)
+
+	r2, err := newR2("file handle")
+	if err != nil {
+		return nil, err
+	}
+	dg.Defer(r2.Close)
+
+	// All resources acquired successfully - transfer cleanup responsibility
+	// to the server struct
+	return &server{
+		r1: r1,
+		r2: r2,
+		dg: dg.Transfer(),
+	}, nil
+}
+
+// newServer creates a server, acquiring multiple resources. If any acquisition
+// fails, previously acquired resources are cleaned up automatically.
+func newServer() (*server, error) {
+	return newServerWith(newResource, newResource)
+}
+
+func (s *server) Close() {
+	s.dg.Done()
+}
+
+func ExampleGroup_Transfer() {
+	srv, err := newServer()
+	if err != nil {
+		fmt.Println("failed to create server")
+		return
+	}
+	defer srv.Close()
+	fmt.Println("server created")
+	// Output:
+	// server created
+	// closing file handle
+	// closing connection
+}
+
+func ExampleGroup_Transfer_partialFailure() {
+	srv, err := newServerWith(newResource, newFailedResource)
+	if err != nil {
+		fmt.Println("failed to create server")
+		return
+	}
+	defer srv.Close()
+	fmt.Println("server created")
+	// Output:
+	// closing connection
+	// failed to create server
 }
