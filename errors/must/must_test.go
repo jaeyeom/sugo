@@ -94,7 +94,7 @@ func ExampleAny() {
 		// Any can be used with any types, but it's less efficient. For
 		// any types that must package does not support, consider
 		// writing your own 2-line defer function, or use Any.
-		var i = Any(strconv.Atoi("a")).(int)
+		i := Any(strconv.Atoi("a")).(int)
 		fmt.Println(i)
 
 		return nil
@@ -161,13 +161,15 @@ func ExampleHandleErr_fromGoVersion2Draft() {
 		})
 
 		r := Any(os.Open(src)).(*os.File)
-		defer r.Close()
+		defer r.Close() //nolint:errcheck
 
 		w := Any(os.Create(dst)).(*os.File)
 		// Note that this should be HandleErrNext(), not HandleErr().
 		defer HandleErrNext(func(error) {
-			w.Close()
-			os.Remove(dst) // (only if a check fails)
+			w.Close() //nolint:errcheck
+			if err := os.Remove(dst); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
 		})
 
 		Int64(io.Copy(w, r))
@@ -175,6 +177,7 @@ func ExampleHandleErr_fromGoVersion2Draft() {
 		return nil
 	}
 	_ = copyFile
+	// Output:
 }
 
 func ExampleHandleErr_fromGoVersion2DraftTestedSuccess() {
