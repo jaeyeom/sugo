@@ -1,0 +1,33 @@
+# Bazel
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-sugo*
+.bazel_output
+
+# Logs
+*.log
+
+# Environment
+.env
+.envrc
+
+
+# Go
+*.exe
+*.test
+
+
+
+
+# Editor
+.idea/
+.vscode/
+*.sw?
+
+# OS
+.DS_Store
+
+# Coverage
+lcov.info
+coverage/

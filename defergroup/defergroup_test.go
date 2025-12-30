@@ -109,7 +109,7 @@ func newResource(name string) (*resource, error) {
 	return &resource{name: name}, nil
 }
 
-func newFailedResource(name string) (*resource, error) {
+func newFailedResource(_ string) (*resource, error) {
 	return nil, errors.New("unable to create resource")
 }
 

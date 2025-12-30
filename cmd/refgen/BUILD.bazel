@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["refgen.go"],
+    importpath = "github.com/jaeyeom/sugo/cmd/refgen",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "refgen",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)

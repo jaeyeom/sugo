@@ -41,15 +41,16 @@ func TestSizeOfRange_empty(t *testing.T) {
 	properties.Property("empty returns true iff the for-loop count equals zero", prop.ForAll(
 		func(begin, end, step int) bool {
 			var count int
-			if step > 0 {
+			switch {
+			case step > 0:
 				for i := begin; i < end; i += step {
 					count++
 				}
-			} else if step < 0 {
+			case step < 0:
 				for i := begin; i > end; i += step {
 					count++
 				}
-			} else {
+			default:
 				for i := begin; i < end; i++ {
 					count++
 				}
@@ -69,15 +70,16 @@ func TestSizeOfRange(t *testing.T) {
 	properties.Property("size should match with what the for-loop counts", prop.ForAll(
 		func(begin, end, step int) bool {
 			var count int
-			if step > 0 {
+			switch {
+			case step > 0:
 				for i := begin; i < end; i += step {
 					count++
 				}
-			} else if step < 0 {
+			case step < 0:
 				for i := begin; i > end; i += step {
 					count++
 				}
-			} else {
+			default:
 				for i := begin; i < end; i++ {
 					count++
 				}
@@ -134,21 +136,22 @@ func TestRange_Ith(t *testing.T) {
 		func(begin, end, step int) bool {
 			var count int
 			fi := Range(begin, end, step)
-			if step > 0 {
+			switch {
+			case step > 0:
 				for i := begin; i < end; i += step {
 					if fi.Ith(count) != i {
 						return false
 					}
 					count++
 				}
-			} else if step < 0 {
+			case step < 0:
 				for i := begin; i > end; i += step {
 					if fi.Ith(count) != i {
 						return false
 					}
 					count++
 				}
-			} else {
+			default:
 				for i := begin; i < end; i++ {
 					if fi.Ith(count) != i {
 						return false

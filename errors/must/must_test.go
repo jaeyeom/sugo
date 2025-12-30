@@ -197,7 +197,7 @@ func ExampleHandleErr_fromGoVersion2DraftTestedSuccess() {
 		w := fmt.Sprintf("*File(%q)", dst)
 		fmt.Printf("os.Create(dst) is called: %q\n", dst)
 		// Note that this should be HandleErrNext(), not HandleErr().
-		defer HandleErrNext(func(newerr error) {
+		defer HandleErrNext(func(_ error) {
 			fmt.Printf("w.Close() is called in defer: %s\n", w)
 			fmt.Printf("os.Remove(dst) is called: %q\n", dst)
 		})
@@ -233,7 +233,7 @@ func ExampleHandleErr_fromGoVersion2DraftTestedWriteFail() {
 		w := fmt.Sprintf("*File(%q)", dst)
 		fmt.Printf("os.Create(dst) is called: %q\n", dst)
 		// Note that this should be HandleErrNext(), not HandleErr().
-		defer HandleErrNext(func(newerr error) {
+		defer HandleErrNext(func(_ error) {
 			fmt.Printf("w.Close() is called in defer: %s\n", w)
 			fmt.Printf("os.Remove(dst) is called: %q\n", dst)
 		})

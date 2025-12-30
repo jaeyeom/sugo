@@ -1,0 +1,25 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "dim.go",
+        "ranger.go",
+    ],
+    importpath = "github.com/jaeyeom/sugo/ranger",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "dim_test.go",
+        "ranger_test.go",
+    ],
+    embed = [":go_default_library"],
+    deps = [
+        "@com_github_leanovate_gopter//:go_default_library",
+        "@com_github_leanovate_gopter//gen:go_default_library",
+        "@com_github_leanovate_gopter//prop:go_default_library",
+    ],
+)

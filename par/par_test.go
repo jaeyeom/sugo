@@ -68,7 +68,7 @@ func ExampleFor_sum() {
 		out := make(chan int)
 		go func() {
 			defer close(out)
-			For(n, func(i int) {
+			For(n, func(_ int) {
 				out <- sum(in)
 			})
 		}()
@@ -98,7 +98,7 @@ func ExampleDo_sum() {
 		},
 		func() {
 			defer close(partial)
-			For(10, func(i int) {
+			For(10, func(_ int) {
 				partial <- sum(nums)
 			})
 		},
@@ -161,7 +161,7 @@ func ExampleDo_sumReturnErr() {
 			},
 			func() {
 				defer close(partial)
-				For(10, func(i int) {
+				For(10, func(_ int) {
 					select {
 					case partial <- sum(nums):
 					case <-ctx.Done():

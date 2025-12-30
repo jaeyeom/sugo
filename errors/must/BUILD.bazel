@@ -1,0 +1,17 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "must.go",
+        "recover.go",
+    ],
+    importpath = "github.com/jaeyeom/sugo/errors/must",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["must_test.go"],
+    embed = [":go_default_library"],
+)

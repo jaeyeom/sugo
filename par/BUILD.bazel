@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["par.go"],
+    importpath = "github.com/jaeyeom/sugo/par",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["par_test.go"],
+    embed = [":go_default_library"],
+    deps = ["//ranger:go_default_library"],
+)

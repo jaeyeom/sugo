@@ -1,20 +1,37 @@
-.PHONY: all check format check-format test lint fix
+.PHONY: all check format test lint fix clean test-bazel
 
 all: format test fix
 
 check: check-format test lint
 
-format:
-	gofmt -w .
-
 check-format:
-	test -z "$$(gofmt -l .)"
+	bazel test //tools/format/...:all
 
-test:
-	go test -v ./...
+format:
+	bazel run //tools/format
 
-lint:
+test: test-bazel
+
+lint: lint-go
+
+fix: fix-go
+
+test-bazel:
+	bazel test //...
+
+# Go lint and fix isn't integrated with bazel yet. Nogo is a good option.
+.PHONY: lint-go fix-go
+
+lint-go: go.sum
 	golangci-lint run ./...
 
-fix:
+fix-go: go.sum
 	golangci-lint run --fix ./...
+
+go.sum: go.mod
+	go mod tidy
+
+
+
+clean:
+	bazel clean

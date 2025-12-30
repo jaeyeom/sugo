@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier
+_src_path: gh:jaeyeom/bazel-monorepo-template
+_commit: 91dc4addcba0f4409ab8732523b3f6dcb9c0a269
+repo_name: "sugo"
+project_description: "A Bazel-based mono repo project"
+github_owner: "jaeyeom"
+languages: [go]
+go_version: "1.24.2"
+go_module_path: "github.com/jaeyeom/sugo"
+python_version: "3.14"
+bazel_version: "8.5.0"
+author_name: "Jaehyun Yeom"
+author_email: "jae.yeom@gmail.com"
