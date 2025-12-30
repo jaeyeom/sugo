@@ -45,7 +45,6 @@ func TestReturnError_noError(t *testing.T) {
 }
 
 func ExampleReturnErr() {
-	// TODO: Fix the fragile test dependency to the error message.
 	err := func() (err error) {
 		// All errors captured by must package is returned. Without this
 		// defer line captured errors will panic.
@@ -89,7 +88,6 @@ func ExampleReturnErr_multipleRecover() {
 }
 
 func ExampleAny() {
-	// TODO: Fix the fragile test dependency to the error message.
 	err := func() (err error) {
 		defer ReturnErr(&err)
 
@@ -107,8 +105,6 @@ func ExampleAny() {
 }
 
 func ExampleLogErr() {
-	// TODO: Fix the fragile test dependency to the error message.
-	//
 	// This is probably an anti-pattern because error was logged and
 	// returned, handled twice.
 	err := func() (err error) {
@@ -125,8 +121,6 @@ func ExampleLogErr() {
 }
 
 func ExampleHandleErr_wrapError() {
-	// TODO: Fix the fragile test dependency to the error message.
-	//
 	// This example shows how to wrap the error. You may use more
 	// sophisticated wrappers like "github.com/pkg/errors".Wrap or multi
 	// error appender.
@@ -143,7 +137,6 @@ func ExampleHandleErr_wrapError() {
 }
 
 func ExampleHandleErr_justReturnError() {
-	// TODO: Fix the fragile test dependency to the error message.
 	err := func() (err error) {
 		// Equivalent with ReturnErr(&err). Param name is newerr for err
 		// visibility.
