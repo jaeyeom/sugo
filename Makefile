@@ -1,6 +1,11 @@
-.PHONY: all check check-format format test lint fix clean test-bazel
+.PHONY: all check check-format format test lint fix clean test-bazel tidy
 
-all: format test fix
+all: tidy format test fix
+
+tidy: MODULE.bazel.lock go.sum
+
+MODULE.bazel.lock: MODULE.bazel go.sum
+	bazel mod tidy
 
 check: check-format test lint
 
@@ -14,6 +19,8 @@ test: test-bazel
 
 lint: lint-go
 
+# Target fix is best-effort autofix for lint issues. If autofix is not
+# available, it still runs lint checks.
 fix: fix-go
 
 test-bazel:
@@ -29,8 +36,7 @@ fix-go: go.sum
 	golangci-lint run --fix ./...
 
 go.sum: go.mod
-	go mod tidy
-
+	bazel run @rules_go//go -- mod tidy
 
 
 clean:

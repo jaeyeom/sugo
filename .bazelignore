@@ -1,0 +1,7 @@
+# Bazel ignore file
+# Directories listed here are excluded from Bazel's package discovery
+
+# Common directories to always ignore
+vendor/
+node_modules/
+.git/
