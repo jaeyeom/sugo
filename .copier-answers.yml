@@ -1,6 +1,6 @@
 # Changes here will be overwritten by Copier
 _src_path: gh:jaeyeom/bazel-project-template
-_commit: 91dc4addcba0f4409ab8732523b3f6dcb9c0a269
+_commit: 0984d9f4314ef4eb496b2c9c3b9d0536cdf874bf
 repo_name: "sugo"
 project_description: "Sugo offers handy syntactic sugar (though not technically a syntactic sugar) for Go, designed to simplify your code and save you time."
 github_owner: "jaeyeom"
