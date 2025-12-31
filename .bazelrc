@@ -3,6 +3,10 @@
 # Use Bazel modules
 common --enable_bzlmod
 
+# Termux workaround: disable network metrics collection (causes
+# NullPointerException in some environments)
+common --noexperimental_collect_system_network_usage
+
 # Build settings - LLM optimized for minimal noise
 build --incompatible_enable_cc_toolchain_resolution
 build --remote_local_fallback

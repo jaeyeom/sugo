@@ -1,13 +1,14 @@
 # Changes here will be overwritten by Copier
+_commit: v0.0.2
 _src_path: gh:jaeyeom/bazel-project-template
-_commit: 0984d9f4314ef4eb496b2c9c3b9d0536cdf874bf
-repo_name: "sugo"
-project_description: "Sugo offers handy syntactic sugar (though not technically a syntactic sugar) for Go, designed to simplify your code and save you time."
-github_owner: "jaeyeom"
-languages: [go]
-go_version: "1.24.2"
-go_module_path: "github.com/jaeyeom/sugo"
-python_version: "3.14"
-bazel_version: "8.5.0"
-author_name: "Jaehyun Yeom"
-author_email: "jae.yeom@gmail.com"
+author_email: jae.yeom@gmail.com
+author_name: Jaehyun Yeom
+bazel_version: 8.5.0
+github_owner: jaeyeom
+go_module_path: github.com/jaeyeom/sugo
+go_version: 1.24.2
+languages:
+- go
+project_description: Sugo offers handy syntactic sugar (though not technically a syntactic
+    sugar) for Go, designed to simplify your code and save you time.
+repo_name: sugo
