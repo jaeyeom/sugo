@@ -1,4 +1,4 @@
-.PHONY: all check format test lint fix clean test-bazel
+.PHONY: all check check-format format test lint fix clean test-bazel
 
 all: format test fix
 
