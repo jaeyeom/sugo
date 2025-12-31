@@ -2,7 +2,7 @@
 _src_path: gh:jaeyeom/bazel-project-template
 _commit: 91dc4addcba0f4409ab8732523b3f6dcb9c0a269
 repo_name: "sugo"
-project_description: "A Bazel-based mono repo project"
+project_description: "Sugo offers handy syntactic sugar (though not technically a syntactic sugar) for Go, designed to simplify your code and save you time."
 github_owner: "jaeyeom"
 languages: [go]
 go_version: "1.24.2"
