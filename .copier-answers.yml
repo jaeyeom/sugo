@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_src_path: gh:jaeyeom/bazel-monorepo-template
+_src_path: gh:jaeyeom/bazel-project-template
 _commit: 91dc4addcba0f4409ab8732523b3f6dcb9c0a269
 repo_name: "sugo"
 project_description: "A Bazel-based mono repo project"
