@@ -3,7 +3,34 @@ package defergroup
 import (
 	"errors"
 	"fmt"
+	"sync"
+	"sync/atomic"
+	"testing"
 )
+
+func TestDeferConcurrent(t *testing.T) {
+	g := New()
+	var count atomic.Int64
+	const n = 100
+
+	var wg sync.WaitGroup
+	wg.Add(n)
+	for range n {
+		go func() {
+			defer wg.Done()
+			g.Defer(func() {
+				count.Add(1)
+			})
+		}()
+	}
+	wg.Wait()
+
+	g.Done()
+
+	if got := count.Load(); got != n {
+		t.Errorf("expected %d deferred calls, got %d", n, got)
+	}
+}
 
 func ExampleGroup_noop() {
 	f := func() {

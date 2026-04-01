@@ -11,8 +11,11 @@
 // management, ensuring that cleanup code is only executed when necessary.
 package defergroup
 
+import "sync"
+
 // Group is a deferred function group.
 type Group struct {
+	mu  sync.Mutex
 	fns []func()
 	err *error
 }
@@ -54,16 +57,23 @@ func New(opts ...Option) *Group {
 // Done runs the deferred functions in the group in last-in-first-out order. It
 // will skip the deferred functions if the error is nil.
 func (g *Group) Done() {
+	g.mu.Lock()
 	if g.err != nil && *g.err == nil {
+		g.mu.Unlock()
 		return
 	}
-	for i := len(g.fns) - 1; i >= 0; i-- {
-		g.fns[i]()
+	fns := g.fns
+	g.fns = nil
+	g.mu.Unlock()
+	for i := len(fns) - 1; i >= 0; i-- {
+		fns[i]()
 	}
 }
 
 // Defer adds a deferred function to the group.
 func (g *Group) Defer(f func()) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	g.fns = append(g.fns, f)
 }
 
@@ -78,6 +88,8 @@ func (g *Group) Clear() {
 // CancelAll cancels the deferred functions in the group. [Done] would have no
 // effect.
 func (g *Group) CancelAll() {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	g.fns = nil
 }
 
@@ -91,6 +103,8 @@ func (g *Group) CancelAll() {
 // failure, then transfer the group to a struct field on success. The struct's
 // Close method can then call Done to release all resources.
 func (g *Group) Transfer(opts ...Option) *Group {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	newGroup := New(opts...)
 	newGroup.fns = g.fns
 	g.fns = nil
