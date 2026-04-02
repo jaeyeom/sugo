@@ -69,15 +69,18 @@ func ExampleDoWithTimeout() {
 	// Scenario 2: Function times out
 	ctx2 := context.Background()
 	timeout2 := 10 * time.Millisecond
+	done := make(chan struct{})
 	f2 := func() error {
+		defer close(done)
 		time.Sleep(100 * time.Millisecond)
-		fmt.Println("Function 2 completed (this should not print if timeout works)")
 		return nil
 	}
 	err2 := DoWithTimeout(ctx2, timeout2, f2)
 	if err2 != nil {
 		fmt.Printf("Function 2 error: %v\n", err2)
 	}
+	// Wait for the goroutine to finish to avoid a data race on stdout.
+	<-done
 
 	// Output:
 	// Function 1 completed
