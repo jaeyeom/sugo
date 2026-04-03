@@ -3,6 +3,7 @@ package defergroup
 import (
 	"errors"
 	"fmt"
+	"sync"
 )
 
 func ExampleGroup_noop() {
@@ -232,4 +233,33 @@ func ExampleGroup_Transfer_partialFailure() {
 	// Output:
 	// closing connection
 	// failed to create server
+}
+
+// ExampleGroup_concurrentDefer demonstrates how to safely use a Group from
+// multiple goroutines by protecting Defer calls with a sync.Mutex.
+func ExampleGroup_concurrentDefer() {
+	var mu sync.Mutex
+	g := New()
+	defer g.Done()
+
+	var wg sync.WaitGroup
+	for _, name := range []string{"resource 1", "resource 2", "resource 3"} {
+		wg.Add(1)
+		go func(name string) {
+			defer wg.Done()
+			r, err := newResource(name)
+			if err != nil {
+				return
+			}
+			mu.Lock()
+			g.Defer(r.Close)
+			mu.Unlock()
+		}(name)
+	}
+	wg.Wait()
+
+	// Unordered output:
+	// closing resource 1
+	// closing resource 2
+	// closing resource 3
 }

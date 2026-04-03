@@ -12,6 +12,9 @@
 package defergroup
 
 // Group is a deferred function group.
+//
+// A Group must not be used concurrently from multiple goroutines without
+// external synchronization.
 type Group struct {
 	fns []func()
 	err *error
