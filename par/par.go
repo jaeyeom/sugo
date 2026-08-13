@@ -34,3 +34,21 @@ func Do(fs ...func()) {
 	}
 	wg.Wait()
 }
+
+// ForEach calls f(v) concurrently for each element of s. The function blocks
+// until all goroutines finish.
+func ForEach[T any](s []T, f func(T)) {
+	For(len(s), func(i int) {
+		f(s[i])
+	})
+}
+
+// Map applies f to each element of s concurrently and returns a slice of the
+// results in the same order. The function blocks until all goroutines finish.
+func Map[T, U any](s []T, f func(T) U) []U {
+	out := make([]U, len(s))
+	For(len(s), func(i int) {
+		out[i] = f(s[i])
+	})
+	return out
+}

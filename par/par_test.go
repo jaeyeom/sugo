@@ -4,8 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"sync"
+	"sync/atomic"
+	"testing"
+	"time"
 
 	"github.com/jaeyeom/sugo/ranger"
 )
@@ -184,4 +188,134 @@ func ExampleDo_sumReturnErr() {
 	// Output:
 	// 4950 <nil>
 	// 0 intentional error
+}
+
+func TestForEachAppliesToEachElement(t *testing.T) {
+	s := []int{1, 2, 3, 4}
+	var seen [5]atomic.Bool
+	ForEach(s, func(v int) {
+		seen[v].Store(true)
+	})
+	for _, v := range s {
+		if !seen[v].Load() {
+			t.Errorf("ForEach did not apply to %d", v)
+		}
+	}
+}
+
+func TestForEachEmptyIsNoop(t *testing.T) {
+	called := false
+	ForEach([]int{}, func(int) { called = true })
+	if called {
+		t.Error("ForEach on empty slice called f")
+	}
+	ForEach(([]int)(nil), func(int) { called = true })
+	if called {
+		t.Error("ForEach on nil slice called f")
+	}
+}
+
+func TestForEachRunsConcurrently(t *testing.T) {
+	const n = 8
+	started := make(chan struct{}, n)
+	release := make(chan struct{})
+	s := make([]int, n)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		ForEach(s, func(int) {
+			started <- struct{}{}
+			<-release
+		})
+	}()
+	for i := 0; i < n; i++ {
+		select {
+		case <-started:
+		case <-time.After(2 * time.Second):
+			t.Fatalf("only %d/%d callbacks started; not concurrent", i, n)
+		}
+	}
+	close(release)
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("ForEach did not return after callbacks finished")
+	}
+}
+
+func TestMapTransformsAndPreservesOrder(t *testing.T) {
+	got := Map([]int{1, 2, 3, 4}, func(v int) int { return v * 10 })
+	want := []int{10, 20, 30, 40}
+	if !slices.Equal(got, want) {
+		t.Errorf("Map() = %v, want %v", got, want)
+	}
+}
+
+func TestMapEmpty(t *testing.T) {
+	got := Map([]int{}, func(v int) int { return v })
+	if len(got) != 0 {
+		t.Errorf("Map(empty) = %v, want empty", got)
+	}
+	got = Map(([]int)(nil), func(v int) int { return v })
+	if len(got) != 0 {
+		t.Errorf("Map(nil) = %v, want empty", got)
+	}
+}
+
+func TestMapDifferentTypes(t *testing.T) {
+	got := Map([]int{1, 2, 3}, strconv.Itoa)
+	want := []string{"1", "2", "3"}
+	if !slices.Equal(got, want) {
+		t.Errorf("Map() = %v, want %v", got, want)
+	}
+}
+
+func TestMapRunsConcurrently(t *testing.T) {
+	const n = 8
+	started := make(chan struct{}, n)
+	release := make(chan struct{})
+	s := make([]int, n)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_ = Map(s, func(v int) int {
+			started <- struct{}{}
+			<-release
+			return v
+		})
+	}()
+	for i := 0; i < n; i++ {
+		select {
+		case <-started:
+		case <-time.After(2 * time.Second):
+			t.Fatalf("only %d/%d callbacks started; not concurrent", i, n)
+		}
+	}
+	close(release)
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("Map did not return after callbacks finished")
+	}
+}
+
+func ExampleForEach() {
+	var mu sync.Mutex
+	var got []int
+	ForEach([]int{3, 1, 2}, func(v int) {
+		mu.Lock()
+		got = append(got, v*v)
+		mu.Unlock()
+	})
+	slices.Sort(got)
+	fmt.Println(got)
+	// Output: [1 4 9]
+}
+
+func ExampleMap() {
+	fmt.Println(Map([]int{1, 2, 3}, func(v int) int { return v * v }))
+	fmt.Println(Map([]string{"a", "bb", "ccc"}, func(s string) int { return len(s) }))
+	// Output:
+	// [1 4 9]
+	// [1 2 3]
 }
