@@ -8,8 +8,9 @@ that enhance readability and efficiency in Go programming.
  - **par**: Run multiple goroutines concurrently, possibly for parellelizing it.
  - **errors/must**: If you prefer not to manually handle errors, you may use it.
  - **ptr/ref**: Convenient way to create a pointer to a literal value.
+   Use `ref.Of` for any type.
  - **ptr/deref**: Convenient way to dereference a pointer with a default value
-   for a `nil` pointer.
+   for a `nil` pointer. Use `deref.Of` / `deref.Or` for any type.
  - **arg**: ArgMin/ArgMax.
  - **ranger**: To deal with integer indices safely. It's more useful with `par`.
 
