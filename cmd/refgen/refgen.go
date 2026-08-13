@@ -42,7 +42,7 @@ func generateRefs(ts []typeName) {
 	for _, t := range ts {
 		fmt.Printf("// %s returns a pointer to v.\n", t.funcName())
 		fmt.Printf("func %s(v %s) *%s {\n", t.funcName(), t.String(), t.String())
-		fmt.Printf("\treturn &v\n")
+		fmt.Printf("\treturn Of(v)\n")
 		fmt.Println("}")
 		fmt.Println()
 	}
@@ -52,16 +52,12 @@ func generateDerefs(ts []typeName) {
 	for _, t := range ts {
 		fmt.Printf("// %sOr returns a dereferenced value or the given default value if p is nil.\n", t.funcName())
 		fmt.Printf("func %sOr(p *%s, defVal %s) %s {\n", t.funcName(), t.String(), t.String(), t.String())
-		fmt.Println("\tif p == nil {")
-		fmt.Println("\t\treturn defVal")
-		fmt.Println("\t}")
-		fmt.Println("\treturn *p")
+		fmt.Printf("\treturn Or(p, defVal)\n")
 		fmt.Println("}")
 		fmt.Println()
 		fmt.Printf("// %s returns a dereferenced value or the zero value if p is nil.\n", t.funcName())
 		fmt.Printf("func %s(p *%s) %s {\n", t.funcName(), t.String(), t.String())
-		fmt.Printf("\tvar defVal %s\n", t.String())
-		fmt.Printf("\treturn %sOr(p, defVal)\n", t.funcName())
+		fmt.Printf("\treturn Of(p)\n")
 		fmt.Println("}")
 		fmt.Println()
 	}
