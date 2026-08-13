@@ -121,3 +121,110 @@ func TestDoWithTimeout_ContextCanceledDuringExecution(t *testing.T) {
 		t.Errorf("Expected context.Canceled, got %v", err)
 	}
 }
+
+func TestDo_Success(t *testing.T) {
+	ctx := context.Background()
+	timeout := 100 * time.Millisecond
+	f := func() (string, error) {
+		time.Sleep(10 * time.Millisecond)
+		return "ok", nil
+	}
+
+	got, err := Do(ctx, timeout, f)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if got != "ok" {
+		t.Errorf("Expected %q, got %q", "ok", got)
+	}
+}
+
+func TestDo_Timeout(t *testing.T) {
+	ctx := context.Background()
+	timeout := 10 * time.Millisecond
+	f := func() (string, error) {
+		time.Sleep(100 * time.Millisecond)
+		return "too late", nil
+	}
+
+	got, err := Do(ctx, timeout, f)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Errorf("Expected context.DeadlineExceeded, got %v", err)
+	}
+	if got != "" {
+		t.Errorf("Expected zero value, got %q", got)
+	}
+}
+
+func TestDo_ContextCanceled(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	timeout := 100 * time.Millisecond
+	f := func() (string, error) {
+		time.Sleep(10 * time.Millisecond)
+		return "ok", nil
+	}
+
+	cancel()
+	got, err := Do(ctx, timeout, f)
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("Expected context.Canceled, got %v", err)
+	}
+	if got != "" {
+		t.Errorf("Expected zero value, got %q", got)
+	}
+}
+
+func TestDo_FunctionError(t *testing.T) {
+	ctx := context.Background()
+	timeout := 100 * time.Millisecond
+	expectedErr := errors.New("function error")
+	f := func() (string, error) {
+		return "partial", expectedErr
+	}
+
+	got, err := Do(ctx, timeout, f)
+	if !errors.Is(err, expectedErr) {
+		t.Errorf("Expected error %v, got %v", expectedErr, err)
+	}
+	if got != "partial" {
+		t.Errorf("Expected %q, got %q", "partial", got)
+	}
+}
+
+func TestDo_ContextCanceledDuringExecution(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	timeout := 100 * time.Millisecond
+	f := func() (int, error) {
+		time.Sleep(50 * time.Millisecond)
+		return 42, nil
+	}
+
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		cancel()
+	}()
+
+	got, err := Do(ctx, timeout, f)
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("Expected context.Canceled, got %v", err)
+	}
+	if got != 0 {
+		t.Errorf("Expected zero value, got %d", got)
+	}
+}
+
+func ExampleDo() {
+	ctx := context.Background()
+	timeout := 100 * time.Millisecond
+	f := func() (string, error) {
+		return "hello", nil
+	}
+	got, err := Do(ctx, timeout, f)
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		return
+	}
+	fmt.Println(got)
+	// Output:
+	// hello
+}
