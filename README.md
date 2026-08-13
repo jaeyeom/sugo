@@ -7,6 +7,7 @@ that enhance readability and efficiency in Go programming.
 ## Features
  - **par**: Run multiple goroutines concurrently, possibly for parellelizing it.
  - **errors/must**: If you prefer not to manually handle errors, you may use it.
+   Use `must.Of` / `must.Of2` / `must.Of3` for any type.
  - **ptr/ref**: Convenient way to create a pointer to a literal value.
    Use `ref.Of` for any type.
  - **ptr/deref**: Convenient way to dereference a pointer with a default value

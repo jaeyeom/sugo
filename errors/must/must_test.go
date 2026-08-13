@@ -91,9 +91,10 @@ func ExampleAny() {
 	err := func() (err error) {
 		defer ReturnErr(&err)
 
-		// Any can be used with any types, but it's less efficient. For
-		// any types that must package does not support, consider
-		// writing your own 2-line defer function, or use Any.
+		// Any can be used with any types, but it's less efficient. Prefer
+		// Of, which keeps the concrete type. For types that must package
+		// does not support, consider writing your own 2-line defer
+		// function, or use Any.
 		i := Any(strconv.Atoi("a")).(int)
 		fmt.Println(i)
 
@@ -102,6 +103,73 @@ func ExampleAny() {
 	fmt.Println(err)
 	// Output:
 	// strconv.Atoi: parsing "a": invalid syntax
+}
+
+func ExampleOf() {
+	i := Of(strconv.Atoi("1"))
+	fmt.Println(i)
+	// Output:
+	// 1
+}
+
+func TestOf(t *testing.T) {
+	type point struct {
+		X, Y int
+	}
+	got := Of(point{X: 1, Y: 2}, nil)
+	if got != (point{X: 1, Y: 2}) {
+		t.Errorf("Of(point, nil) = %#v, want {1 2}", got)
+	}
+}
+
+func TestOf_error(t *testing.T) {
+	err := func() (err error) {
+		defer ReturnErr(&err)
+		_ = Of(0, errors.New("boom"))
+		t.Error("Of should not return when err is non-nil")
+		return nil
+	}()
+	if err == nil || err.Error() != "boom" {
+		t.Errorf("Of(_, boom) error = %v, want boom", err)
+	}
+}
+
+func TestOf2(t *testing.T) {
+	gotA, gotB := Of2('x', 2, nil)
+	if gotA != 'x' || gotB != 2 {
+		t.Errorf("Of2('x', 2, nil) = (%q, %d), want ('x', 2)", gotA, gotB)
+	}
+}
+
+func TestOf2_error(t *testing.T) {
+	err := func() (err error) {
+		defer ReturnErr(&err)
+		_, _ = Of2(0, "", errors.New("boom"))
+		t.Error("Of2 should not return when err is non-nil")
+		return nil
+	}()
+	if err == nil || err.Error() != "boom" {
+		t.Errorf("Of2(_, _, boom) error = %v, want boom", err)
+	}
+}
+
+func TestOf3(t *testing.T) {
+	gotA, gotB, gotC := Of3('x', true, "ok", nil)
+	if gotA != 'x' || !gotB || gotC != "ok" {
+		t.Errorf("Of3('x', true, \"ok\", nil) = (%q, %t, %q), want ('x', true, ok)", gotA, gotB, gotC)
+	}
+}
+
+func TestOf3_error(t *testing.T) {
+	err := func() (err error) {
+		defer ReturnErr(&err)
+		_, _, _ = Of3(0, false, "", errors.New("boom"))
+		t.Error("Of3 should not return when err is non-nil")
+		return nil
+	}()
+	if err == nil || err.Error() != "boom" {
+		t.Errorf("Of3(_, _, _, boom) error = %v, want boom", err)
+	}
 }
 
 func ExampleLogErr() {

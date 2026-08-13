@@ -41,6 +41,19 @@ func (ts typeNames) returnList() string {
 	return strings.Join(args, ", ")
 }
 
+func (ts typeNames) genericCall() string {
+	switch len(ts) {
+	case 1:
+		return "Of(" + ts.returnList() + ", err)"
+	case 2:
+		return "Of2(" + ts.returnList() + ", err)"
+	case 3:
+		return "Of3(" + ts.returnList() + ", err)"
+	default:
+		panic(fmt.Sprintf("unsupported arity %d", len(ts)))
+	}
+}
+
 var types = []typeNames{
 	{"bool"},
 	{"string"},
@@ -90,8 +103,7 @@ func main() {
 	for _, ts := range types {
 		fmt.Printf("// %s panics if err is non-nil and returns %s.\n", ts.funcName(), ts.returnTypeList())
 		fmt.Printf("func %s(%s, err error) %s {\n", ts.funcName(), ts.argList(), ts.returnTypeList())
-		fmt.Println("\tCheckErr(err, 2)")
-		fmt.Printf("\treturn %s\n", ts.returnList())
+		fmt.Printf("\treturn %s\n", ts.genericCall())
 		fmt.Println("}")
 		fmt.Println()
 	}
